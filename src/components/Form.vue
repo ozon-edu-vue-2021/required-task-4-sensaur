@@ -78,27 +78,23 @@
         </div>
 
         <h2>Паспортные данные</h2>
-        <!--        <li-->
-        <!--          v-for="citizenship in filteredCitizenshipList"-->
-        <!--          :key="citizenship.length"-->
-        <!--        >-->
-        <!--          {{ citizenship.nationality }}-->
-        <!--        </li>-->
         <div class="row">
           <div class="col-sm-12">
             <div class="form-select" v-click-outside="hideDropdown">
-              <label for="citizenship" class="form-label"> Гражданство </label>
-              <div>
-                <b-form-input list="my-list-id"></b-form-input>
-                <datalist id="my-list-id">
-                  <option
-                    v-for="citizenship in allCitizenship"
-                    :key="citizenship._id"
-                  >
-                    {{ citizenship.nationality }}
-                  </option>
-                </datalist>
-              </div>
+              <label for="citizenship" class="form-label">
+                Гражданство {{ formData.citizenship }}</label
+              >
+              <!--              <div>-->
+              <!--                <b-form-input list="my-list-id"></b-form-input>-->
+              <!--                <datalist id="my-list-id">-->
+              <!--                  <option-->
+              <!--                      v-for="citizenship in allCitizenship"-->
+              <!--                      :key="citizenship._id"-->
+              <!--                  >-->
+              <!--                    {{ citizenship.nationality }}-->
+              <!--                  </option>-->
+              <!--                </datalist>-->
+              <!--              </div>-->
               <input
                 id="citizenship"
                 @focus="isDropdownOpen = true"
@@ -106,9 +102,9 @@
                 class="form-control"
               />
               <div v-if="isDropdownOpen">
-                <ul v-if="allCitizenship.length">
+                <ul v-if="filteredCitizenshipList.length">
                   <li
-                    v-for="citizenship in allCitizenship"
+                    v-for="citizenship in filteredCitizenshipList"
                     :key="citizenship._id"
                     @click="onCitizenshipClicked(citizenship)"
                   >
@@ -284,7 +280,7 @@
 import ClickOutside from "vue-click-outside";
 import citizenship from "../../src/assets/data/citizenships.json";
 import passportTypes from "../../src/assets/data/passport-types.json";
-import { throttle } from "../helpers";
+import { throttle } from "@/helpers";
 
 export default {
   data() {
@@ -316,7 +312,6 @@ export default {
       allPassportTypes: passportTypes,
       throttledSearchCitizenship: null,
       searchWord: "",
-      filteredCitizenshipList: "",
     };
   },
   methods: {
@@ -326,6 +321,7 @@ export default {
     onCitizenshipClicked(selectedCitizenship) {
       this.formData.citizenship = selectedCitizenship.nationality;
       this.isPassportRussian = this.formData.citizenship === "Russia";
+      this.searchWord = "";
       this.hideDropdown();
     },
     onNameChangedClicked() {
@@ -338,7 +334,6 @@ export default {
     },
     getCitizenship() {
       console.log("searchWord==>", this.searchWord);
-      console.log("filteredCitizenshipList==>", this.filteredCitizenshipList);
     },
   },
   directives: {
@@ -353,11 +348,16 @@ export default {
       this.throttledSearchCitizenship(newValue);
     },
   },
-  // computed: {
-  // filteredCitizenshipList() {
-  // return this.allCitizenship.filter(function (str) { return str.indexOf(this.searchWord) === -1; })
-  // },
-  // },
+  computed: {
+    filteredCitizenshipList() {
+      return this.allCitizenship.filter(
+        (cur) =>
+          cur.nationality
+            .toLowerCase()
+            .indexOf(this.searchWord.toLowerCase()) !== -1
+      );
+    },
+  },
 };
 </script>
 
