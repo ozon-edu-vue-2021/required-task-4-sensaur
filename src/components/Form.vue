@@ -3,7 +3,7 @@
     <div class="row">
       {{ formData }}
     </div>
-    <form autocomplete="off" class="form">
+    <form autocomplete="off" class="form" @submit.prevent="formSubmit">
       <h2>Личные данные</h2>
 
       <div class="row">
@@ -137,6 +137,14 @@
             <div>Меняли ли фамилию или имя</div>
             <input
               v-model="formData.nameChanged"
+              id="no"
+              type="radio"
+              name="nameChanged"
+              value="Нет"
+            />
+            <label for="no"> Нет </label>
+            <input
+              v-model="formData.nameChanged"
               id="yes"
               type="radio"
               name="nameChanged"
@@ -144,22 +152,15 @@
               checked
             />
             <label for="yes"> Да </label>
-            <input
-              v-model="formData.nameChanged"
-              id="no"
-              type="radio"
-              name="nameChanged"
-              value="Нет"
-            />
-            <label for="no"> Нет </label>
           </div>
           <div v-if="isNameChanged">
-            <label for="PreviousSurname"> Фамилия </label>
-            <input v-model="formData.PreviousSurname" id="PreviousSurname" />
-            <label for="PreviousName"> Имя </label>
-            <input v-model="formData.PreviousName" id="PreviousName" />
+            <label for="previousSurname"> Предыдущая фамилия </label>
+            <input v-model="formData.previousSurname" id="previousSurname" />
+            <label for="previousName"> Предыдущее имя </label>
+            <input v-model="formData.previousName" id="previousName" />
           </div>
         </div>
+        <button>Отправить</button>
       </div>
     </form>
   </div>
@@ -171,7 +172,7 @@ import citizenship from "../../src/assets/data/citizenships.json";
 import passportTypes from "../../src/assets/data/passport-types.json";
 
 // console.log(citizenship);
-console.log(passportTypes);
+// console.log(passportTypes);
 
 export default {
   data() {
@@ -186,7 +187,7 @@ export default {
         email: "",
         gender: "",
         citizenship: "",
-        passportTypes: "",
+        // passportTypes: "",
         passportRusSerial: "",
         passportRusNumber: "",
         passportForeignNumber: "",
@@ -194,8 +195,8 @@ export default {
         passportForeignIssueCountry: "",
         passportForeignType: "",
         passportForeignTypeList: "",
-        PreviousSurname: "",
-        PreviousName: "",
+        previousSurname: "",
+        previousName: "",
       },
       isDropdownOpen: false,
       isPassportRussian: false,
@@ -218,6 +219,9 @@ export default {
       this.formData.nameChanged === "Да"
         ? (this.isNameChanged = true)
         : (this.isNameChanged = false);
+    },
+    formSubmit() {
+      console.log("UPDATE API EVENT", this.formData);
     },
   },
   directives: {
