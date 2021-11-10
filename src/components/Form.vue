@@ -10,11 +10,23 @@
               v-model="formData.surname"
               id="surname"
               class="form-control"
+              @input="onCyrillicInputSurname"
             />
+            <span v-if="formData.cyrillicErrorsSurname" class="error">
+              {{ formData.cyrillicErrorsSurname }}
+            </span>
           </div>
           <div class="col">
             <label for="name" class="form-label"> Имя </label>
-            <input v-model="formData.name" id="name" class="form-control" />
+            <input
+              v-model="formData.name"
+              id="name"
+              class="form-control"
+              @input="onCyrillicInputName"
+            />
+            <span v-if="formData.cyrillicErrorsName" class="error">
+              {{ formData.cyrillicErrorsName }}
+            </span>
           </div>
           <div class="col">
             <label for="secondName" class="form-label"> Отчество </label>
@@ -22,7 +34,11 @@
               v-model="formData.secondName"
               id="secondName"
               class="form-control"
+              @input="onCyrillicInputSecondName"
             />
+            <span v-if="formData.cyrillicErrorsSecondName" class="error">
+              {{ formData.cyrillicErrorsSecondName }}
+            </span>
           </div>
         </div>
         <div class="row">
@@ -44,8 +60,11 @@
               id="email"
               placeholder="test-email@mail.com"
               class="form-control"
-              type="email"
+              @input="onEmailInput"
             />
+            <span v-if="formData.emailErrors" class="error">
+              {{ formData.emailErrors }}
+            </span>
           </div>
         </div>
         <div class="row">
@@ -255,7 +274,14 @@
                   v-model="formData.previousSurname"
                   id="previousSurname"
                   class="form-control"
+                  @input="onCyrillicInputPreviousSurname"
                 />
+                <span
+                  v-if="formData.cyrillicErrorsPreviousSurname"
+                  class="error"
+                >
+                  {{ formData.cyrillicErrorsPreviousSurname }}
+                </span>
               </div>
               <div class="col-sm-6">
                 <label for="previousName"> Предыдущее имя </label>
@@ -263,7 +289,11 @@
                   v-model="formData.previousName"
                   id="previousName"
                   class="form-control"
+                  @input="onCyrillicInputPreviousName"
                 />
+                <span v-if="formData.cyrillicErrorsPreviousName" class="error">
+                  {{ formData.cyrillicErrorsPreviousName }}
+                </span>
               </div>
             </div>
           </div>
@@ -281,6 +311,9 @@ import ClickOutside from "vue-click-outside";
 import citizenship from "../../src/assets/data/citizenships.json";
 import passportTypes from "../../src/assets/data/passport-types.json";
 import { throttle } from "@/helpers";
+
+const EMAIL_REG_EXP = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const CYRILLIC_REG_EXP = /^[?!,.а-яА-ЯёЁ]+$/;
 
 export default {
   data() {
@@ -304,6 +337,12 @@ export default {
         passportForeignTypeList: "",
         previousSurname: "",
         previousName: "",
+        emailErrors: "",
+        cyrillicErrorsName: "",
+        cyrillicErrorsSurname: "",
+        cyrillicErrorsSecondName: "",
+        cyrillicErrorsPreviousSurname: "",
+        cyrillicErrorsPreviousName: "",
       },
       isDropdownOpen: false,
       isPassportRussian: false,
@@ -330,10 +369,63 @@ export default {
         : (this.isNameChanged = false);
     },
     formSubmit() {
-      console.log("UPDATE API EVENT", this.formData);
+      if (
+        !this.formData.emailErrors &
+        !this.formData.cyrillicErrorsName &
+        !this.formData.cyrillicErrorsSurname &
+        !this.formData.cyrillicErrorsSecondName &
+        !this.formData.cyrillicErrorsPreviousSurname &
+        !this.formData.cyrillicErrorsPreviousName
+      ) {
+        console.log("UPDATE API EVENT", this.formData);
+      } else {
+        console.log("FAILED UPDATE API EVENT");
+      }
     },
     getCitizenship() {
       console.log("searchWord==>", this.searchWord);
+    },
+    onEmailInput() {
+      if (!EMAIL_REG_EXP.test(this.formData.email)) {
+        this.formData.emailErrors = "Проверьте правильность ввода email";
+      } else {
+        this.formData.emailErrors = "";
+      }
+    },
+    onCyrillicInputName() {
+      if (!CYRILLIC_REG_EXP.test(this.formData.name)) {
+        this.formData.cyrillicErrorsName = "заполняeтся кириллицей";
+      } else {
+        this.formData.cyrillicErrorsName = "";
+      }
+    },
+    onCyrillicInputSecondName() {
+      if (!CYRILLIC_REG_EXP.test(this.formData.secondName)) {
+        this.formData.cyrillicErrorsSecondName = "заполняeтся кириллицей";
+      } else {
+        this.formData.cyrillicErrorsSecondName = "";
+      }
+    },
+    onCyrillicInputSurname() {
+      if (!CYRILLIC_REG_EXP.test(this.formData.surname)) {
+        this.formData.cyrillicErrorsSurname = "заполняeтся кириллицей";
+      } else {
+        this.formData.cyrillicErrorsSurname = "";
+      }
+    },
+    onCyrillicInputPreviousSurname() {
+      if (!CYRILLIC_REG_EXP.test(this.formData.previousSurname)) {
+        this.formData.cyrillicErrorsPreviousSurname = "заполняeтся кириллицей";
+      } else {
+        this.formData.cyrillicErrorsPreviousSurname = "";
+      }
+    },
+    onCyrillicInputPreviousName() {
+      if (!CYRILLIC_REG_EXP.test(this.formData.previousName)) {
+        this.formData.cyrillicErrorsPreviousName = "заполняeтся кириллицей";
+      } else {
+        this.formData.cyrillicErrorsPreviousName = "";
+      }
     },
   },
   directives: {
@@ -361,4 +453,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.error {
+  color: darkred;
+}
+</style>
