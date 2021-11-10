@@ -116,20 +116,22 @@
               id="passportForeignIssueCountry"
               v-model="formData.passportForeignIssueCountry"
             />
-            <!--            <label for="passportForeignType"> Тип паспорта </label>-->
-            <!--            <input-->
-            <!--              id="passportForeignType"-->
-            <!--              v-model="formData.passportForeignType"-->
-            <!--            />-->
-            <select
-              class="form-control"
-              v-model="selected"
-              @change="doSomethingWithChangedValue"
-            >
-              <option v-for="item in inventory" :value="item" :key="item.id">
-                @{{ item.name }}
+
+            <label for="passportForeignType"> Тип паспорта </label>
+            <input
+              id="passportForeignType"
+              list="passportForeignTypeList"
+              name="passportForeignType"
+              v-model="formData.passportForeignType"
+            />
+            <datalist id="passportForeignTypeList">
+              <option
+                v-for="passportTypes in allPassportTypes"
+                :key="passportTypes.id"
+              >
+                {{ passportTypes.type }}
               </option>
-            </select>
+            </datalist>
           </div>
           <div class="row radio" @change="onNameChangedClicked()">
             <div>Меняли ли фамилию или имя</div>
@@ -169,7 +171,7 @@ import citizenship from "../../src/assets/data/citizenships.json";
 import passportTypes from "../../src/assets/data/passport-types.json";
 
 // console.log(citizenship);
-// console.log(passportTypes);
+console.log(passportTypes);
 
 export default {
   data() {
@@ -184,12 +186,14 @@ export default {
         email: "",
         gender: "",
         citizenship: "",
+        passportTypes: "",
         passportRusSerial: "",
         passportRusNumber: "",
         passportForeignNumber: "",
         passportRusIssueDate: "",
         passportForeignIssueCountry: "",
         passportForeignType: "",
+        passportForeignTypeList: "",
         PreviousSurname: "",
         PreviousName: "",
       },
@@ -197,7 +201,7 @@ export default {
       isPassportRussian: false,
       isNameChanged: false,
       allCitizenship: citizenship,
-      allPasportTypes: passportTypes,
+      allPassportTypes: passportTypes,
     };
   },
   methods: {
