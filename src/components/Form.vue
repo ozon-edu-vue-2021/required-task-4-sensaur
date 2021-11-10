@@ -44,6 +44,7 @@
               id="email"
               placeholder="test-email@mail.com"
               class="form-control"
+              type="email"
             />
           </div>
         </div>
@@ -77,21 +78,31 @@
         </div>
 
         <h2>Паспортные данные</h2>
+        <!--        <li-->
+        <!--          v-for="citizenship in filteredCitizenshipList"-->
+        <!--          :key="citizenship.length"-->
+        <!--        >-->
+        <!--          {{ citizenship.nationality }}-->
+        <!--        </li>-->
         <div class="row">
           <div class="col-sm-12">
-            <!--            <select class="form-select" aria-label="Default select example">-->
-            <!--              <option selected>Гражданство тест</option>-->
-            <!--              <option value="1">One</option>-->
-            <!--              <option value="2">Two</option>-->
-            <!--              <option value="3">Three</option>-->
-            <!--            </select>-->
-
             <div class="form-select" v-click-outside="hideDropdown">
               <label for="citizenship" class="form-label"> Гражданство </label>
+              <div>
+                <b-form-input list="my-list-id"></b-form-input>
+                <datalist id="my-list-id">
+                  <option
+                    v-for="citizenship in allCitizenship"
+                    :key="citizenship._id"
+                  >
+                    {{ citizenship.nationality }}
+                  </option>
+                </datalist>
+              </div>
               <input
                 id="citizenship"
                 @focus="isDropdownOpen = true"
-                v-model="formData.citizenship"
+                v-model="searchWord"
                 class="form-control"
               />
               <div v-if="isDropdownOpen">
@@ -176,9 +187,18 @@
                   </label>
                   <input
                     id="passportForeignIssueCountry"
+                    list="passportForeignIssueCountryList"
                     v-model="formData.passportForeignIssueCountry"
-                    class="form-control"
+                    class="form-select"
                   />
+                  <datalist id="passportForeignIssueCountryList">
+                    <option
+                      v-for="citizenship in allCitizenship"
+                      :key="citizenship._id"
+                    >
+                      {{ citizenship.nationality }}
+                    </option>
+                  </datalist>
                 </div>
                 <div class="col-sm-4">
                   <label for="passportForeignType"> Тип паспорта </label>
@@ -261,14 +281,10 @@
 </template>
 
 <script>
-// const bootstrap = require('bootstrap')
 import ClickOutside from "vue-click-outside";
 import citizenship from "../../src/assets/data/citizenships.json";
 import passportTypes from "../../src/assets/data/passport-types.json";
-
-// console.log(citizenship);
-// console.log(passportTypes);
-// console.log(bootstrap);
+import { throttle } from "../helpers";
 
 export default {
   data() {
@@ -298,6 +314,9 @@ export default {
       isNameChanged: false,
       allCitizenship: citizenship,
       allPassportTypes: passportTypes,
+      throttledSearchCitizenship: null,
+      searchWord: "",
+      filteredCitizenshipList: "",
     };
   },
   methods: {
@@ -305,7 +324,6 @@ export default {
       this.isDropdownOpen = false;
     },
     onCitizenshipClicked(selectedCitizenship) {
-      // selectedCitizenship.nationality = undefined;
       this.formData.citizenship = selectedCitizenship.nationality;
       this.isPassportRussian = this.formData.citizenship === "Russia";
       this.hideDropdown();
@@ -318,10 +336,28 @@ export default {
     formSubmit() {
       console.log("UPDATE API EVENT", this.formData);
     },
+    getCitizenship() {
+      console.log("searchWord==>", this.searchWord);
+      console.log("filteredCitizenshipList==>", this.filteredCitizenshipList);
+    },
   },
   directives: {
     ClickOutside,
   },
+  created() {
+    this.allCitizenship = citizenship;
+    this.throttledSearchCitizenship = throttle(this.getCitizenship, 2000);
+  },
+  watch: {
+    searchWord(newValue) {
+      this.throttledSearchCitizenship(newValue);
+    },
+  },
+  // computed: {
+  // filteredCitizenshipList() {
+  // return this.allCitizenship.filter(function (str) { return str.indexOf(this.searchWord) === -1; })
+  // },
+  // },
 };
 </script>
 
