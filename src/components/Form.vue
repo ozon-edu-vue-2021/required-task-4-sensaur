@@ -63,7 +63,6 @@
             @focus="isDropdownOpen = true"
             v-model="formData.citizenship"
           />
-
           <div v-if="isDropdownOpen" class="citizenship-selector___dropdown">
             <ul v-if="allCitizenship.length">
               <li
@@ -77,6 +76,88 @@
             <div v-else class="empty">Ничего на найдено</div>
           </div>
         </div>
+
+        <div>
+          <div v-if="isPassportRussian">
+            <label for="passportRusSerial"> Серия паспорта </label>
+            <input
+              id="passportRusSerial"
+              v-model="formData.passportRusSerial"
+            />
+            <label for="passportRusNumber"> Номер паспорта </label>
+            <input
+              id="passportRusNumber"
+              v-model="formData.passportRusNumber"
+            />
+            <label for="passportRusIssueDate"> Дата выдачи</label>
+            <input
+              id="passportRusIssueDate"
+              placeholder="ДД.ММ.ГГГГ"
+              v-model="formData.passportRusIssueDate"
+            />
+          </div>
+          <div v-else>
+            <div class="row">
+              <label for="latinSurname"> Фамилия на латинице</label>
+              <input v-model="formData.latinSurname" id="latinSurname" />
+              <label for="latinName"> Имя на латинице </label>
+              <input v-model="formData.latinName" id="latinName" />
+            </div>
+            <div class="row">
+              Иностранцы заполняют латинскими буквами. Например Ivanov Ivan
+            </div>
+            <label for="passportForeignNumber"> Номер паспорта </label>
+            <input
+              id="passportForeignNumber"
+              v-model="formData.passportForeignNumber"
+            />
+            <label for="passportForeignIssueCountry"> Страна выдачи </label>
+            <input
+              id="passportForeignIssueCountry"
+              v-model="formData.passportForeignIssueCountry"
+            />
+            <!--            <label for="passportForeignType"> Тип паспорта </label>-->
+            <!--            <input-->
+            <!--              id="passportForeignType"-->
+            <!--              v-model="formData.passportForeignType"-->
+            <!--            />-->
+            <select
+              class="form-control"
+              v-model="selected"
+              @change="doSomethingWithChangedValue"
+            >
+              <option v-for="item in inventory" :value="item" :key="item.id">
+                @{{ item.name }}
+              </option>
+            </select>
+          </div>
+          <div class="row radio" @change="onNameChangedClicked()">
+            <div>Меняли ли фамилию или имя</div>
+            <input
+              v-model="formData.nameChanged"
+              id="yes"
+              type="radio"
+              name="nameChanged"
+              value="Да"
+              checked
+            />
+            <label for="yes"> Да </label>
+            <input
+              v-model="formData.nameChanged"
+              id="no"
+              type="radio"
+              name="nameChanged"
+              value="Нет"
+            />
+            <label for="no"> Нет </label>
+          </div>
+          <div v-if="isNameChanged">
+            <label for="PreviousSurname"> Фамилия </label>
+            <input v-model="formData.PreviousSurname" id="PreviousSurname" />
+            <label for="PreviousName"> Имя </label>
+            <input v-model="formData.PreviousName" id="PreviousName" />
+          </div>
+        </div>
       </div>
     </form>
   </div>
@@ -85,8 +166,10 @@
 <script>
 import ClickOutside from "vue-click-outside";
 import citizenship from "../../src/assets/data/citizenships.json";
+import passportTypes from "../../src/assets/data/passport-types.json";
 
-console.log(citizenship);
+// console.log(citizenship);
+// console.log(passportTypes);
 
 export default {
   data() {
@@ -94,14 +177,27 @@ export default {
       formData: {
         surname: "",
         name: "",
+        latinSurname: "",
+        latinName: "",
         secondName: "",
         birthDate: "",
         email: "",
         gender: "",
         citizenship: "",
+        passportRusSerial: "",
+        passportRusNumber: "",
+        passportForeignNumber: "",
+        passportRusIssueDate: "",
+        passportForeignIssueCountry: "",
+        passportForeignType: "",
+        PreviousSurname: "",
+        PreviousName: "",
       },
       isDropdownOpen: false,
+      isPassportRussian: false,
+      isNameChanged: false,
       allCitizenship: citizenship,
+      allPasportTypes: passportTypes,
     };
   },
   methods: {
@@ -109,8 +205,15 @@ export default {
       this.isDropdownOpen = false;
     },
     onCitizenshipClicked(selectedCitizenship) {
+      // selectedCitizenship.nationality = undefined;
       this.formData.citizenship = selectedCitizenship.nationality;
+      this.isPassportRussian = this.formData.citizenship === "Russia";
       this.hideDropdown();
+    },
+    onNameChangedClicked() {
+      this.formData.nameChanged === "Да"
+        ? (this.isNameChanged = true)
+        : (this.isNameChanged = false);
     },
   },
   directives: {
@@ -129,6 +232,7 @@ export default {
   padding: 40px;
   overflow: auto;
 }
+
 .citizenship-selector___dropdown {
 }
 </style>
