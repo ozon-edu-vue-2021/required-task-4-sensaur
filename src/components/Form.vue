@@ -314,6 +314,10 @@ import { throttle } from "@/helpers";
 
 const EMAIL_REG_EXP = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CYRILLIC_REG_EXP = /^[?!,.а-яА-ЯёЁ]+$/;
+// const SERIA_REG_EXP = /^d{4}$/;
+// const NUMBER_REG_EXP = /^d{6}$/;
+// const DATE_REG_EXP = /^[a-zA-Z]+$/;
+// const LATIN_REG_EXP = /^[a-zA-Z]+$/;
 
 export default {
   data() {
