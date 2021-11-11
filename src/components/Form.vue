@@ -49,7 +49,12 @@
               id="birthDate"
               placeholder="ДД.ММ.ГГГГ"
               class="form-control"
+              type="date"
+              @input="onDate"
             />
+            <span v-if="formData.birthDateErrors" class="error">
+              {{ formData.birthDateErrors }}
+            </span>
           </div>
         </div>
         <div class="row">
@@ -144,7 +149,11 @@
                     id="passportRusSerial"
                     v-model="formData.passportRusSerial"
                     class="form-control"
+                    @input="onSerialInputName"
                   />
+                  <span v-if="formData.passportRusErrorsSerial" class="error">
+                    {{ formData.passportRusErrorsSerial }}
+                  </span>
                 </div>
                 <div class="col-sm-3">
                   <label for="passportRusNumber"> Номер паспорта </label>
@@ -152,7 +161,11 @@
                     id="passportRusNumber"
                     v-model="formData.passportRusNumber"
                     class="form-control"
+                    @input="onNumberInputName"
                   />
+                  <span v-if="formData.passportRusErrorsNumber" class="error">
+                    {{ formData.passportRusErrorsNumber }}
+                  </span>
                 </div>
                 <div class="col-sm-6">
                   <label for="passportRusIssueDate"> Дата выдачи</label>
@@ -173,7 +186,11 @@
                     v-model="formData.latinSurname"
                     id="latinSurname"
                     class="form-control"
+                    @input="onLatinInputSurname"
                   />
+                  <span v-if="formData.latinErrorsSurname" class="error">
+                    {{ formData.latinErrorsSurname }}
+                  </span>
                 </div>
                 <div class="col-sm-6">
                   <label for="latinName"> Имя на латинице </label>
@@ -181,7 +198,11 @@
                     v-model="formData.latinName"
                     id="latinName"
                     class="form-control"
+                    @input="onLatinInputName"
                   />
+                  <span v-if="formData.latinErrorsName" class="error">
+                    {{ formData.latinErrorsName }}
+                  </span>
                 </div>
               </div>
               <div class="form-text">
@@ -314,10 +335,10 @@ import { throttle } from "@/helpers";
 
 const EMAIL_REG_EXP = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CYRILLIC_REG_EXP = /^[?!,.а-яА-ЯёЁ]+$/;
-// const SERIA_REG_EXP = /^d{4}$/;
-// const NUMBER_REG_EXP = /^d{6}$/;
+const SERIA_REG_EXP = /^\d{4}$/;
+const NUMBER_REG_EXP = /^\d{6}$/;
 // const DATE_REG_EXP = /^[a-zA-Z]+$/;
-// const LATIN_REG_EXP = /^[a-zA-Z]+$/;
+const LATIN_REG_EXP = /^[a-zA-Z]+$/;
 
 export default {
   data() {
@@ -347,6 +368,12 @@ export default {
         cyrillicErrorsSecondName: "",
         cyrillicErrorsPreviousSurname: "",
         cyrillicErrorsPreviousName: "",
+        passportRusErrorsSerial: "",
+        passportRusErrorsNumber: "",
+        latinErrorsSurname: "",
+        latinErrorsName: "",
+        passportRusErrorsIssueDate: "",
+        birthDateErrors: "",
       },
       isDropdownOpen: false,
       isPassportRussian: false,
@@ -379,7 +406,11 @@ export default {
         !this.formData.cyrillicErrorsSurname &
         !this.formData.cyrillicErrorsSecondName &
         !this.formData.cyrillicErrorsPreviousSurname &
-        !this.formData.cyrillicErrorsPreviousName
+        !this.formData.cyrillicErrorsPreviousName &
+        !this.formData.latinErrorsSurname &
+        !this.formData.latinErrorsName &
+        !this.formData.passportRusErrorsNumber &
+        !this.formData.passportRusErrorsSerial
       ) {
         console.log("UPDATE API EVENT", this.formData);
       } else {
@@ -429,6 +460,42 @@ export default {
         this.formData.cyrillicErrorsPreviousName = "заполняeтся кириллицей";
       } else {
         this.formData.cyrillicErrorsPreviousName = "";
+      }
+    },
+    onLatinInputSurname() {
+      if (!LATIN_REG_EXP.test(this.formData.latinSurname)) {
+        this.formData.latinErrorsSurname = "заполняeтся латиницей";
+      } else {
+        this.formData.latinErrorsSurname = "";
+      }
+    },
+    onLatinInputName() {
+      if (!LATIN_REG_EXP.test(this.formData.latinName)) {
+        this.formData.latinErrorsName = "заполняeтся латиницей";
+      } else {
+        this.formData.latinErrorsName = "";
+      }
+    },
+    onSerialInputName() {
+      if (!SERIA_REG_EXP.test(this.formData.passportRusSerial)) {
+        this.formData.passportRusErrorsSerial = "введите 4 цифры";
+      } else {
+        this.formData.passportRusErrorsSerial = "";
+      }
+    },
+    onNumberInputName() {
+      if (!NUMBER_REG_EXP.test(this.formData.passportRusNumber)) {
+        this.formData.passportRusErrorsNumber = "введите 6 цифр";
+      } else {
+        this.formData.passportRusErrorsNumber = "";
+      }
+    },
+    onDate() {
+      if (Date.now() - Date(this.formData.birthDate) > 0) {
+        this.formData.birthDateErrors =
+          "введите дату не позже сегодняшнего числа";
+      } else {
+        this.formData.birthDateErrors = "";
       }
     },
   },
