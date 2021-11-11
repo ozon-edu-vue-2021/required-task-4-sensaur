@@ -410,7 +410,8 @@ export default {
         !this.formData.latinErrorsSurname &
         !this.formData.latinErrorsName &
         !this.formData.passportRusErrorsNumber &
-        !this.formData.passportRusErrorsSerial
+        !this.formData.passportRusErrorsSerial &
+        !this.formData.birthDateErrors
       ) {
         console.log("UPDATE API EVENT", this.formData);
       } else {
@@ -491,7 +492,8 @@ export default {
       }
     },
     onDate() {
-      if (Date.now() - Date(this.formData.birthDate) > 0) {
+      let todaysDate = new Date();
+      if (new Date(this.formData.birthDate).setHours(0,0,0,0) > todaysDate.setHours(0,0,0,0)) {
         this.formData.birthDateErrors =
           "введите дату не позже сегодняшнего числа";
       } else {
